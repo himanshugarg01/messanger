@@ -48,7 +48,7 @@ io.on('connection', function(socket){
     socket.on('initialize', function(data){
       //  console.log(data);
        // console.log("//////////////"+data.id+"////////////////");
-        
+        if(data.id!=undefined)
         connected[data.id]=socket.id;
         //console.log(socket.id);
         //console.log(connected);

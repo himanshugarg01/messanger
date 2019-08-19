@@ -17,6 +17,7 @@ function LoginService(req, res){
          })
          .catch(err => {
            console.error(err)
+           res.redirect('/login');
            res.send(error)
          })
 }
