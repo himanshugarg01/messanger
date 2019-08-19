@@ -1,0 +1,186 @@
+<!--
+Author: Colorlib
+Author URL: https://colorlib.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<title>MeetGreet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- Custom Theme files -->
+<link href="/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!-- //Custom Theme files -->
+<!-- web font -->
+<link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+<!-- //web font -->
+</head>
+<style>
+	label{
+		margin-right: 10px;
+	}
+	.switch {
+		position: relative;
+		display: inline-block;
+		width: 60px;
+		height: 34px;
+	}
+	
+	.switch input { 
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+	
+	.slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #ccc;
+		-webkit-transition: .4s;
+		transition: .4s;
+	}
+	
+	.slider:before {
+		position: absolute;
+		content: "";
+		height: 26px;
+		width: 26px;
+		left: 4px;
+		bottom: 4px;
+		background-color: white;
+		-webkit-transition: .4s;
+		transition: .4s;
+	}
+	
+	input:checked + .slider {
+		background-color: #2196F3;
+	}
+	
+	input:focus + .slider {
+		box-shadow: 0 0 1px #2196F3;
+	}
+	
+	input:checked + .slider:before {
+		-webkit-transform: translateX(26px);
+		-ms-transform: translateX(26px);
+		transform: translateX(26px);
+	}
+	
+	/* Rounded sliders */
+	.slider.round {
+		border-radius: 34px;
+	}
+	
+	.slider.round:before {
+		border-radius: 50%;
+	}
+	</style>
+<body>
+		<a href="/chat" ><button id="getChat" style="display: none;"></button></a>
+	<!-- main -->
+	<div class="main-w3layouts wrapper">
+		<h1>Create Group  <button class="btn btn-success" id="addGroup" disabled onclick="addGroup(event)">Create</button></h1>
+
+		<div class="main-agileinfo">
+			<div class="agileits-top">
+				<form action="" method="">
+					<input class="text" type="text" name="groupName" id="groupName" onkeypress="check()" placeholder="Group Name" required="">
+					<br>
+					<br>
+					<!-- <input type="submit" id="formAddGroup" style="visibility:hidden" value="Create Group"> -->
+					<ul>
+					<%for(var i=0;i<data.length;i++){%>
+						<li style="color : #fff;"><h4><label class="switch">
+							<input type="checkbox" id="<%=data[i]._id%>" onchange="selectMember(event)">
+							<span class="slider round"></span>
+						</label><%=data[i].userName%></h4></li>
+						<hr>
+						<%}%>
+					</ul>
+				</form>
+			</div>
+		</div>
+	
+		<!-- copyright -->
+	
+		<!-- //copyright -->
+		<ul class="colorlib-bubbles">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<!-- //main -->
+	<script>
+		var members=[];
+	function	selectMember(event)
+	{
+		console.log(event.target.checked,event.target.id);
+		if(event.target.checked===true)
+		{
+			members.push(event.target.id);
+		}
+		else
+		{
+			members=members.filter(function(value, index, arr){
+
+			return value != event.target.id;
+
+		});
+		}
+		check();
+		
+	}
+	
+	function check()
+	{
+		console.log('sdfghjk');
+		if(!members.length||document.getElementById('groupName').value=="")
+		{
+			document.getElementById("addGroup").setAttribute("disabled",true);
+		}
+		else
+		{
+			document.getElementById("addGroup").removeAttribute("disabled");
+			
+		}
+	}
+	function addGroup(event)
+	{
+		var request = new XMLHttpRequest();
+          request.addEventListener('load', function()
+          {
+						//console.log(window.location);
+						document.getElementById("getChat").click();
+					//	window.location='localhost'
+          });
+          request.open('POST', '/addGroup');
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send(JSON.stringify({'groupName' : document.getElementById('groupName').value,'members' : members}));
+	}
+	</script>
+
+</body>
+</html>

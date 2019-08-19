@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <style>
+        </style>
+        
+    </head>
+    <body>
+        <div class="chat">
+
+        </div>
+        <form>
+            <input class="id">
+            <input class="msg">
+            <button>send</button>
+        </form>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            let id = `<%= phno %>`;
+            let socket = io.connect();
+            document.querySelector('form').onsubmit = (event) => {
+                event.preventDefault();
+                let msg = document.querySelector('.msg').value;
+                let Rid = document.querySelector('.id').value;
+                socket.emit('send message', {
+                    Sid: id,
+                    Rid,
+                    msg
+                });
+            }
+            socket.emit('connected',{id});
+            socket.on('new message', (msg) =>{
+                console.log(msg);
+            })
+        </script>
+    </body>
+</html>

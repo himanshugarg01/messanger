@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket Connection</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px;width: 1550px;position: fixed;bottom: 0; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      #messages { margin-bottom: 40px }
+    </style>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <style>
+      body{
+        height: 100vh;
+      }
+      body > div{
+        height: 100%;
+        display: flex;
+      }
+      .block1{
+        width: 400px;
+        border : 2px solid;
+      }
+      .block2{
+        flex: 1;
+        position: relative;
+        border : 2px solid;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+    <div class="block1">
+    <div style="margin-bottom : 25px;">
+      <h1>Friends</h1>
+     <a href="/addfriend"> <button class="btn btn-success" >ADD Friend</button> </a>
+     <a href="/addGroup"> <button class="btn btn-danger" >Create Group</button> </a>
+    </div>  
+
+    <ul id="friendlist" class="list-group"></ul>
+    </div>
+    <div class="block2">
+    <ul id="messages"></ul>
+    <form action="" style="visibility: hidden;" id="myForm">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    </div>
+   </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var data;
+      var user;
+      var currentChat="";
+      var currentChatBox="";
+      var group=false;
+
+      function getUser()
+      {
+        var request = new XMLHttpRequest();
+    request.addEventListener('load', function()
+    {
+       data=JSON.parse(request.responseText);
+       console.log(data);
+       user=data;
+       socket.emit('initialize',data);
+       
+    });
+    request.open('POST', '/chat/getUser');
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send();
+
+      }
+    function startChat(event){
+      group=false;
+      document.getElementById('myForm').setAttribute('style','visibility : visible')
+          console.log(event.target.id);
+          currentChat=event.target.id;
+          document.getElementById("messages").innerHTML="";
+
+
+          var request = new XMLHttpRequest();
+          request.addEventListener('load', function()
+          {
+           let chat=JSON.parse(request.responseText);
+            console.log(chat);
+            currentChatBox=chat._id;
+            for(let i=0;i<chat.message.length;i++)
+            {
+              var node = document.createElement("li");
+          node.setAttribute('class','list-group-item')
+          node.innerHTML =chat.message[i].senderName+" : "+ chat.message[i].msg ;
+            document.getElementById("messages").appendChild(node)
+            }
+            
+          });
+          request.open('POST', '/chat/getMessages');
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send(JSON.stringify({'friendId' : currentChat}));
+        }
+
+
+
+      function getFriends()
+      {
+        var request = new XMLHttpRequest();
+    request.addEventListener('load', function()
+    {
+       data=JSON.parse(request.responseText);
+       console.log(data.friends);
+       var ul=document.getElementById('friendlist');
+
+       for(let i=0;i<data.friends.length;i++)
+       {
+        var li=document.createElement('li');
+        li.setAttribute('class','list-group-item');
+        li.setAttribute('style','font-size : large;');
+        var button=document.createElement('button');
+        button.innerHTML="chat"
+        button.setAttribute('id',data.friends[i]._id);
+        button.setAttribute('onclick','startChat(event)');
+        button.setAttribute('style','margin-left : 20px');
+        button.setAttribute('class','btn btn-primary btn-xs');
+        
+        li.innerHTML=data.friends[i].firstName;
+        li.appendChild(button);
+        ul.append(li);
+       }
+
+       ///////////groups////////////
+       for(let i=0;i<data.groups.length;i++)
+       {
+        var li=document.createElement('li');
+        li.setAttribute('class','list-group-item');
+        li.setAttribute('style','font-size : large;');
+        var button=document.createElement('button');
+        button.innerHTML="chat"
+        button.setAttribute('id',data.groups[i].chat);
+        button.setAttribute('onclick','startGroupChat(event)');
+        button.setAttribute('style','margin-left : 20px');
+        button.setAttribute('class','btn btn-primary btn-xs');
+        
+        li.innerHTML=data.groups[i].groupName;
+        li.appendChild(button);
+        ul.append(li);
+       }
+       
+    });
+    request.open('POST', '/chat/getfriends');
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send();
+
+      }
+
+      window.onload=getUser();
+      window.onload=getFriends();
+
+
+
+
+
+
+
+
+
+
+
+        var socket = io();
+        socket.on('connection',function(msg){
+          console.log("connected",msg);
+          socket.emit('initialize',data);
+        });
+
+        var msgInput=document.getElementById("m");
+        document.getElementById("myForm").addEventListener("submit", (e)=>{
+          if(group)
+          {
+            socket.emit('group message', {'msg' : document.getElementById("m").value,'currentChatBox' : currentChatBox,'sender' : user,'friends' :groupInfo.users[0].friend });
+
+            // var node = document.createElement("li");
+            // node.setAttribute('class','list-group-item')
+            // node.innerHTML = user.userName+" : "+msgInput.value ;
+            //   document.getElementById("messages").appendChild(node)
+            // window.scrollTo(0, document.body.scrollHeight);
+
+            var request = new XMLHttpRequest();
+            request.addEventListener('load', function()
+            {
+              var msgData=JSON.parse(request.responseText);
+              console.log(msgData);
+              
+              
+            });
+            request.open('POST', '/group/message');
+            request.setRequestHeader("Content-Type", "application/json");
+            request.send(JSON.stringify({'msg' :msgInput.value,'chatBoxId' : currentChatBox}));
+
+            msgInput.value="";
+          }
+          else
+          {
+          socket.emit('chat message', {'msg' : document.getElementById("m").value,'currentChat' : currentChat,'sender' : user});
+
+          var node = document.createElement("li");
+          node.setAttribute('class','list-group-item')
+          node.innerHTML = user.userName+" : "+msgInput.value ;
+            document.getElementById("messages").appendChild(node)
+          window.scrollTo(0, document.body.scrollHeight);
+
+          var request = new XMLHttpRequest();
+          request.addEventListener('load', function()
+          {
+            var msgData=JSON.parse(request.responseText);
+            console.log(msgData);
+            
+            
+          });
+          request.open('POST', '/chat/message');
+          request.setRequestHeader("Content-Type", "application/json");
+          request.send(JSON.stringify({'msg' :msgInput.value,'chatBoxId' : currentChatBox}));
+
+          msgInput.value="";
+        }
+          e.preventDefault();
+        });
+
+        
+       
+        socket.on('chat message', function(data){
+          if(data.sender.id===currentChat)
+          {
+          var node = document.createElement("li");
+          node.setAttribute('class','list-group-item')
+          node.innerHTML = data.sender.userName+" : "+data.msg ;
+            document.getElementById("messages").appendChild(node)
+          window.scrollTo(0, document.body.scrollHeight);
+          }
+        });
+      
+        socket.on('group message', function(data){
+          console.log(data.currentChatBox,currentChatBox);
+          
+          if(data.currentChatBox===currentChatBox)
+          {
+          var node = document.createElement("li");
+          node.setAttribute('class','list-group-item')
+          node.innerHTML = data.sender.userName+" : "+data.msg ;
+            document.getElementById("messages").appendChild(node)
+          window.scrollTo(0, document.body.scrollHeight);
+          }
+        });
+
+
+
+
+
+
+
+
+        function startGroupChat(event){
+          group=true;
+      document.getElementById('myForm').setAttribute('style','visibility : visible')
+          console.log(event.target.id);
+          currentChatBox=event.target.id;
+          document.getElementById("messages").innerHTML="";
+
+
+          var request = new XMLHttpRequest();
+          request.addEventListener('load', function()
+          {
+           let chat=JSON.parse(request.responseText);
+            console.log(chat);
+            groupInfo=chat;
+            currentChatBox=chat._id;
+            for(let i=0;i<chat.message.length;i++)
+            {
+              var node = document.createElement("li");
+          node.setAttribute('class','list-group-item')
+          node.innerHTML =chat.message[i].senderName+" : "+ chat.message[i].msg ;
+            document.getElementById("messages").appendChild(node)
+            }
+            
+          });
+          request.open('POST', '/group/getMessages');
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send(JSON.stringify({'chatBoxId' : currentChatBox}));
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+[
+  {
+    "friends": [
+      {
+        "friends": [],
+        "_id": "5d512e962da73549edcbc3fc",
+        "firstName": "himanshu",
+        "lastName": "garg",
+        "userName": "him",
+        "password": "1",
+        "__v": 0
+      },
+      {
+        "friends": [
+          "5d512e962da73549edcbc3fc"
+        ],
+        "_id": "5d51451b6119b05e71903b97",
+        "firstName": "rishav",
+        "lastName": "garg",
+        "userName": "rishav@cq.com",
+        "password": "1",
+        "__v": 0
+      }
+    ],
+    "_id": "5d523aa28238f71a71d01b64",
+    "userName": "hetesh"
+  }
+]
