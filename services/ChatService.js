@@ -84,7 +84,7 @@ function getMessages(req, res){
       '_id' : ObjectId(chatBoxId),
     },
     {
-      $push : {message : {$each:[{'senderId' : req.session.Id,'senderName' : req.session.userName,'msg' : msg}]}}
+      $push : {message : {$each:[{'senderId' : req.session.Id,'senderName' : req.session.userName,'msg' : msg,'timestamp' : Date.now()}]}}
     })
     .then(data => {
         res.send(data);
@@ -96,11 +96,19 @@ function getMessages(req, res){
       })
   }
 
+  function updateOnline(req, res){
+    
+    //console.log("message received "+msg);
+   
+
+  }
+
 
 module.exports = {
     getUser,
     getFriends,
    message,
   getMessages,
+  updateOnline,
 
 };

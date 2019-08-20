@@ -25,6 +25,9 @@ router.post('/message',middleFunc ,(req, res) => {
 router.post('/getMessages',middleFunc ,(req, res) => {
     services.ChatService.getMessages(req, res);
 })
+router.post('/updateOnline',middleFunc ,(req, res) => {
+    services.ChatService.updateOnline(req, res);
+})
 
 
 

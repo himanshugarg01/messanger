@@ -20,6 +20,8 @@ let users = new mongoose.Schema({
     }],
     chatBox : Array,
     groups : Array,
+    online : Boolean,
+    lastSeen : Date,
 
 });
 

@@ -12,10 +12,11 @@ function SignupServices(req, res){
             }
             else{
                 let newUser = new users({
-                    firstName,
-                    lastName,
-                    userName,
-                    password,
+                    'firstName' : firstName,
+                    'lastName' : lastName,
+                    'userName' : userName,
+                     'password' : password,
+                     'online' : false,
                 });
                 newUser.save().then(data => {
                      res.redirect('/login')

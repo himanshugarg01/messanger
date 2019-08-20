@@ -10,6 +10,7 @@ const port = 8000;
 const cors = require('cors');
 var session = require('express-session');
 let connected = require('./statics/variable').connected;
+var ObjectId=require('mongodb').ObjectID;
 
 require('./model/db');
 //Express Middleware
@@ -34,7 +35,7 @@ app.use('/', require('./routes'));
 // })
 
 //----------------- End ----------------//
-
+let users = require('./model/users');
 
 
 
@@ -46,8 +47,6 @@ io.on('connection', function(socket){
     socket.emit('connection','hello');
 
     socket.on('initialize', function(data){
-      //  console.log(data);
-       // console.log("//////////////"+data.id+"////////////////");
         if(data.id!=undefined)
         connected[data.id]=socket.id;
         //console.log(socket.id);
@@ -55,15 +54,79 @@ io.on('connection', function(socket){
         console.log(connected);
     })
 
+    socket.on('online', function(data){
+          //console.log(data.friends);
+         // console.log("//////////////"+data.friends+"////////////////");
+         users.findOneAndUpdate({
+            '_id': data._id
+         },
+         {
+            'online' : true
+         }).then(data=>{
 
-    socket.on('disconnect', function(){
-        console.log('disconnected');
+         })
+         .catch(err=>{
+
+         })
+         for(i=0;i<data.friends.length;i++)
+         {
+            io.to(connected[data.friends[i]._id]).emit('online', data._id);
+         }
+          
+      })
+  
+
+
+    socket.on('disconnect', function(data){
+        console.log('disconnected...');
+        
+        
         let keys = Object.keys(connected);
+    //    console.log(keys);
         keys.forEach((value) => {
-            if(connected[keys] === socket.id){
-                delete connected[keys];
+            if(connected[value] == socket.id){
+              //  console.log("disconneced   .............."+value);
+                delete connected[value];      
+                users.findOneAndUpdate({
+                    '_id' : value,
+                },
+                {
+                    'online' : false,
+                    'lastSeen' : Date.now()
+                })
+                .then(data => {
+                    //res.send(data);
+                  ///  console.log(data);
+                  //  console.log(data.friends[0]);
+                    
+                    for(i=0;i<data.friends.length;i++)
+                    {
+                    //    console.log(connected[data.friends[i]]);
+                        
+                       io.to(connected[data.friends[i]]).emit('offline', data._id);
+                    }
+                    })
+                    .catch(err => {
+                    console.log(err);
+                    
+                    //res.send(err);
+                    })
+                
             }
         })
+       // socket.emit('disconnected',data);
+       
+        //    users.findOneAndUpdate({
+        //       '_id': data._id
+        //    },
+        //    {
+        //       'online' : false
+        //    }).then(data=>{
+  
+        //    })
+        //    .catch(err=>{
+  
+        //    })
        // console.log("sdfghjkl;dfghjklfdghjk///////////////////////////////");
         
         //console.log( connected);
@@ -78,7 +141,7 @@ io.on('connection', function(socket){
         //console.log(data);
        // socket.emit('chat message', data.msg);
         console.log("chat message    "+connected[data.currentChat]);
-        
+        if(connected[data.currentChat]!=undefined)
         io.to(connected[data.currentChat]).emit('chat message', data);
 
         // console.log(connected[data['Rid']])

@@ -56,6 +56,11 @@
       li {
     list-style-type: none;
       }
+      span{
+        margin-bottom: 5px;
+        background-color: green;
+      }
+      
     </style>
   </head>
   <body>
@@ -70,7 +75,7 @@
     <ul id="friendlist" class="list-group"></ul>
     </div>
     <div class="block2" >
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark topBar">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark topBar" id="topBar" style="visibility: hidden;">
             <ul class="navbar-nav">
                 <li class="nav-item">
                   <h4 id="headName"></h4>
@@ -94,6 +99,9 @@
       var currentChat="";
       var currentChatBox="";
       var group=false;
+      var online="🟢";
+      var chat="💬";
+      var pInfo;
 
       function getUser()
       {
@@ -104,7 +112,6 @@
        console.log(data);
        user=data;
        socket.emit('initialize',data);
-       
     });
     request.open('POST', '/chat/getUser');
     request.setRequestHeader("Content-Type", "application/json");
@@ -112,9 +119,11 @@
 
       }
     function startChat(event){
-      document.getElementById('headName').innerHTML=event.target.parentNode.textContent+"  🟢";
+      event.target.innerHTML="💬";
+      document.getElementById('headName').innerHTML=event.target.parentNode.textContent+"";
       group=false;
-      document.getElementById('myForm').setAttribute('style','visibility : visible')
+      document.getElementById('myForm').setAttribute('style','visibility : visible');
+      document.getElementById('topBar').setAttribute('style','visibility : visible')
           console.log(event.target.id);
           currentChat=event.target.id;
           document.getElementById("messages").innerHTML="";
@@ -148,6 +157,7 @@
     request.addEventListener('load', function()
     {
        data=JSON.parse(request.responseText);
+       pInfo=data;
        console.log(data.friends);
        var ul=document.getElementById('friendlist');
 
@@ -155,8 +165,9 @@
        {
         var li=document.createElement('li');
         li.setAttribute('class','list-group-item');
-        li.setAttribute('style','font-size : large;height:51px');
+        li.setAttribute('style','font-size : large;height:61px');
         var button=document.createElement('button');
+        
         button.innerHTML="💬";
         button.setAttribute('id',data.friends[i]._id);
         button.setAttribute('onclick','startChat(event)');
@@ -167,7 +178,14 @@
         
         li.innerHTML=data.friends[i].firstName;
         li.appendChild(button);
-        ul.append(li);
+        
+        if(data.friends[i].online==true)
+        {
+        let div=document.createElement('div');
+        div.innerHTML="<span class=\"badge badge-pill badge-success\">online<span>";
+         li.appendChild(div);
+         }
+         ul.append(li);
        }
 
        ///////////groups////////////
@@ -175,7 +193,7 @@
        {
         var li=document.createElement('li');
         li.setAttribute('class','list-group-item');
-        li.setAttribute('style','font-size : large;height:51px');
+        li.setAttribute('style','font-size : large;height:61px');
         var button=document.createElement('button');
         button.innerHTML="💬";
         button.setAttribute('id',data.groups[i].chat);
@@ -211,6 +229,8 @@
         var socket = io();
         socket.on('connection',function(msg){
           console.log("connected",msg);
+          //console.log(data);
+          socket.emit('online',pInfo);
           socket.emit('initialize',data);
         });
 
@@ -267,16 +287,28 @@
           e.preventDefault();
         });
 
-        
-       
+        socket.on('online', function(id){
+          console.log("online "+id);
+          
+          let div=document.createElement('div');
+          div.innerHTML="<span class=\"badge badge-pill badge-success\">online<span>";
+          document.getElementById(id).parentNode.appendChild(div);
+
+         });
+
+
         socket.on('chat message', function(data){
           if(data.sender.id===currentChat)
           {
           var node = document.createElement("li");
           node.setAttribute('class','list-group-item')
           node.innerHTML = data.sender.userName+" : "+data.msg ;
-            document.getElementById("messages").appendChild(node)
+          document.getElementById("messages").appendChild(node)
           block2.scrollTo(0, block2.scrollHeight);
+          }
+          else
+          {
+            document.getElementById(data.sender.id).innerHTML="💬 🔔";
           }
         });
       
@@ -291,6 +323,16 @@
             document.getElementById("messages").appendChild(node)
             block2.scrollTo(0, block2.scrollHeight);
           }
+          else
+          {
+            document.getElementById(data.currentChatBox).innerHTML="💬 🔔";
+          }
+        });
+        socket.on('offline', function(data){
+         console.log("offline"+data);
+          document.getElementById(data).parentNode.removeChild(document.getElementById(data).parentNode.childNodes[2]);
+
+          
         });
 
 
@@ -301,9 +343,11 @@
 
 
         function startGroupChat(event){
+          event.target.innerHTML="💬";
           document.getElementById('headName').innerHTML=event.target.parentNode.textContent;
           group=true;
-      document.getElementById('myForm').setAttribute('style','visibility : visible')
+      document.getElementById('myForm').setAttribute('style','visibility : visible');
+      document.getElementById('topBar').setAttribute('style','visibility : visible');
           console.log(event.target.id);
           currentChatBox=event.target.id;
           document.getElementById("messages").innerHTML="";
