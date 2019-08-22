@@ -25,4 +25,6 @@ let users = new mongoose.Schema({
 
 });
 
+users.index({userName : 1});
+
 module.exports = mongoose.model('users', users);

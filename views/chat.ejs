@@ -58,7 +58,7 @@
       }
       span{
         margin-bottom: 5px;
-        background-color: green;
+        
       }
       
     </style>
@@ -93,6 +93,18 @@
    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+
+      $('#m').focus(function(){
+        socket.emit('typing',{'user' : user,'currentChat' : currentChat});
+      });
+
+
+      $('#m').blur(function(){
+        socket.emit('stopTyping',{'user' : user,'currentChat' : currentChat});
+      });
+
+
+
       var block2=document.getElementById('block2');
       var data;
       var user;
@@ -183,6 +195,19 @@
         {
         let div=document.createElement('div');
         div.innerHTML="<span class=\"badge badge-pill badge-success\">online<span>";
+         li.appendChild(div);
+         }
+         else{
+
+        let div=document.createElement('div');
+        let date=new Date(data.friends[i].lastSeen||Date.now());
+        let pDate=new Date(Date.now());
+        if(date.getDate()!=pDate.getDate())
+        div.innerHTML="<span class=\"badge badge-pill badge-success\">lastseen <span>"+date.getDate()+"/"+date.getMonth()+"/"+date.getFullYear()+"  "+date.getHours()+":"+date.getMinutes();
+          else
+          {
+            div.innerHTML="<span class=\"badge badge-pill badge-success\">lastseen  <span>"+"today at "+date.getHours()+":"+date.getMinutes();
+          }
          li.appendChild(div);
          }
          ul.append(li);
@@ -289,10 +314,14 @@
 
         socket.on('online', function(id){
           console.log("online "+id);
-          
+          document.getElementById(id).parentNode.removeChild(document.getElementById(id).parentNode.childNodes[2]);
+
           let div=document.createElement('div');
           div.innerHTML="<span class=\"badge badge-pill badge-success\">online<span>";
           document.getElementById(id).parentNode.appendChild(div);
+          document.getElementById('headName').innerHTML=document.getElementById(id).parentNode.textContent;
+         // console.log(document.getElementById('headName').textContent);
+          
 
          });
 
@@ -330,12 +359,29 @@
         });
         socket.on('offline', function(data){
          console.log("offline"+data);
-          document.getElementById(data).parentNode.removeChild(document.getElementById(data).parentNode.childNodes[2]);
-
+         let date=new Date(Date.now());
+          document.getElementById(data).parentNode.childNodes[2].innerHTML="<span class=\"badge badge-pill badge-success\">lastseen  <span>"+"today at "+date.getHours()+":"+date.getMinutes();
+            document.getElementById('headName').innerHTML=document.getElementById(data).parentNode.textContent;
           
         });
 
 
+        socket.on('typing', function(data){
+         console.log("typing"+data.user.id);
+          document.getElementById(data.user.id).parentNode.childNodes[2].innerHTML="<span class=\"badge badge-pill badge-success\">typing  <span>";
+          if(data.user.id==currentChat)
+          document.getElementById('headName').innerHTML=document.getElementById(data.user.id).parentNode.textContent;
+
+
+        });
+
+        socket.on('stopTyping', function(data){
+         console.log("stopTyping"+data.user.id);
+         document.getElementById(data.user.id).parentNode.childNodes[2].innerHTML="<span class=\"badge badge-pill badge-success\">online <span>";
+            if(data.user.id==currentChat)
+          document.getElementById('headName').innerHTML=document.getElementById(data.user.id).parentNode.textContent;
+
+        });
 
 
 
@@ -374,6 +420,7 @@
     request.setRequestHeader("Content-Type", "application/json");
     request.send(JSON.stringify({'chatBoxId' : currentChatBox}));
         }
+
     </script>
   </body>
 </html>

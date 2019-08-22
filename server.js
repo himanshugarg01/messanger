@@ -162,6 +162,19 @@ io.on('connection', function(socket){
         // io.to(connected[data['Rid']]).emit('new message', data.msg)
     })
 
+    socket.on('typing', function(data){
+        //console.log("chat message    "+connected[data.currentChat]);
+        
+        io.to(connected[data.currentChat]).emit('typing', data);
+        
+    })
+    socket.on('stopTyping', function(data){
+        //console.log("chat message    "+connected[data.currentChat]);
+        
+        io.to(connected[data.currentChat]).emit('stopTyping', data);
+        
+    })
+
 });
   
 server.listen(port , ()=>{console.log(`Listening on Port ${port}`)})
