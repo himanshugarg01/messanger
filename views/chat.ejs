@@ -94,6 +94,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
+    $(document).ready(function(){
+        if("<%=messages%>")
+        alert("<%=messages%>");
+    });
+
       $('#m').focus(function(){
         socket.emit('typing',{'user' : user,'currentChat' : currentChat});
       });
@@ -151,7 +156,9 @@
             {
               var node = document.createElement("li");
           node.setAttribute('class','list-group-item')
-          node.innerHTML =chat.message[i].senderName+" : "+ chat.message[i].msg ;
+          var textNode=document.createTextNode(chat.message[i].senderName+" : "+ chat.message[i].msg);
+          node.appendChild(textNode);
+          //node.innerHTML =chat.message[i].senderName+" : "+ chat.message[i].msg ;
             document.getElementById("messages").appendChild(node)
             }
             block2.scrollTo(0, block2.scrollHeight);
@@ -291,7 +298,9 @@
 
           var node = document.createElement("li");
           node.setAttribute('class','list-group-item')
-          node.innerHTML = user.userName+" : "+msgInput.value ;
+          var textNode=document.createTextNode(user.userName+" : "+msgInput.value);
+          node.appendChild(textNode);
+          //node.innerHTML = user.userName+" : "+msgInput.value ;
             document.getElementById("messages").appendChild(node)
           block2.scrollTo(0, block2.scrollHeight);
 
@@ -331,7 +340,9 @@
           {
           var node = document.createElement("li");
           node.setAttribute('class','list-group-item')
-          node.innerHTML = data.sender.userName+" : "+data.msg ;
+          var textNode=document.createTextNode(data.sender.userName+" : "+data.msg);
+          node.appendChild(textNode);
+          //node.innerHTML = data.sender.userName+" : "+data.msg ;
           document.getElementById("messages").appendChild(node)
           block2.scrollTo(0, block2.scrollHeight);
           }
@@ -348,7 +359,9 @@
           {
           var node = document.createElement("li");
           node.setAttribute('class','list-group-item')
-          node.innerHTML = data.sender.userName+" : "+data.msg ;
+          var textNode=document.createTextNode(data.sender.userName+" : "+data.msg);
+          node.appendChild(textNode);
+          //node.innerHTML = data.sender.userName+" : "+data.msg ;
             document.getElementById("messages").appendChild(node)
             block2.scrollTo(0, block2.scrollHeight);
           }
@@ -410,7 +423,9 @@
             {
               var node = document.createElement("li");
           node.setAttribute('class','list-group-item')
-          node.innerHTML =chat.message[i].senderName+" : "+ chat.message[i].msg ;
+          var textNode=document.createTextNode(chat.message[i].senderName+" : "+ chat.message[i].msg);
+          node.appendChild(textNode);
+         // node.innerHTML =chat.message[i].senderName+" : "+ chat.message[i].msg ;
             document.getElementById("messages").appendChild(node)
             }
             block2.scrollTo(0, block2.scrollHeight);

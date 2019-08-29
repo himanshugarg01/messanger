@@ -1,4 +1,11 @@
 let users = require('../model/users');
+let router = require('express').Router();
+var jwt=require('jsonwebtoken');
+var cookieParser = require('cookie-parser');
+router.use(cookieParser());
+
+
+
 
 function LoginService(req, res){
     let {userName, password} = req.body;
@@ -12,13 +19,19 @@ function LoginService(req, res){
           req.session.name=data.firstName;
           req.session.Id=data._id;
           console.log(req.session.islogin);
-          
-           res.redirect('/chat');
+          jwt.sign({userName : req.session.userName},'himanshu',(err,token)=>{
+            console.log('token generated',token);
+            
+            res.cookie('token',token);
+            res.redirect('/chat');
+          });
+         // res.cookie('token' , 'token')
+           
          })
          .catch(err => {
            console.error(err)
            res.redirect('/login');
-           res.send(error)
+           //res.send(error)
          })
 }
 

@@ -3,6 +3,8 @@ let messages = require('../model/messages');
 var ObjectId=require('mongodb').ObjectID;
 
 function getUser(req, res){
+  //console.log(req.cookies);
+  
   console.log("hello");
   
   res.send({'id' : req.session.Id,'userName' : req.session.userName})

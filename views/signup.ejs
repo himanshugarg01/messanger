@@ -18,6 +18,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
 <!-- //web font -->
 </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<style>
+	.spanUName{
+		color: red;
+		font-size: large;
+	}
+</style>
 <body>
 	<!-- main -->
 	<div class="main-w3layouts wrapper">
@@ -27,18 +34,19 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 				<form action="/signup" method="post">
           <input class="text" type="text" name="firstName" placeholder="First Name" required="">
           <br><br>
-          <input class="text" type="text" name="lastName" placeholder="Last Name" required="">
-					<input class="text email" type="text" name="userName" placeholder="Username" required="">
-					<input class="text" type="password" name="password" placeholder="Password" required="">
-					<input class="text w3lpass" type="password" name="password1" placeholder="Confirm Password" required="">
-					<div class="wthree-text">
+					<input class="text" type="text" name="lastName" placeholder="Last Name" required="">
+					<br><br>
+					<input class="text email" type="text" style="margin : 0px" name="userName" id="userName" placeholder="Username" onblur="checkUsername()" required="">	<span id="unameexist" class="spanUName" style="color:red; visibility: hidden">✖️ username already exists</span>
+					<br><br>	<input class="text" type="password" name="password" placeholder="Password" required="">
+							<input class="text w3lpass" type="password" name="password1" placeholder="Confirm Password" required="">
+							<div class="wthree-text">
 						<label class="anim">
 							<input type="checkbox" class="checkbox" required="">
 							<span>I Agree To The Terms & Conditions</span>
 						</label>
 						<div class="clear"> </div>
 					</div>
-					<input type="submit" value="SIGNIN">
+					<input type="submit" value="SIGNIN" id="signUp">
 				</form>
 				<p><a href="/login"> Login Now!</a></p>
 			</div>
@@ -61,4 +69,32 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 	</div>
 	<!-- //main -->
 </body>
+<script>
+function checkUsername(event)
+{
+	var request = new XMLHttpRequest();
+          request.addEventListener('load', function()
+          {
+						var data=JSON.parse(request.responseText);
+						if(data)
+						{
+							document.getElementById('unameexist').setAttribute("style" ,"visibility : visible" );
+							document.getElementById("signUp").setAttribute("disabled",true);
+						}
+						else
+						{
+							document.getElementById('unameexist').setAttribute("style" ,"visibility :hidden" );
+							document.getElementById("signUp").removeAttribute("disabled");
+						}
+          });
+          request.open('POST', '/signup/checkName');
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send(JSON.stringify({'userName' : document.getElementById('userName').value}));
+
+
+	//document.getElementById('unameexist').setAttribute("style" ,"visibility : visible" );
+	
+}
+	
+	</script>
 </html>

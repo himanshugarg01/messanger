@@ -18,6 +18,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
 <!-- //web font -->
 </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <body>
 	<!-- main -->
 	<div class="main-w3layouts wrapper">
@@ -54,4 +55,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 	</div>
 	<!-- //main -->
 </body>
+<script>
+		$(document).ready(function(){
+			if("<%=messages%>")
+			 alert("<%=messages%>");
+	});
+		
+		</script>
 </html>

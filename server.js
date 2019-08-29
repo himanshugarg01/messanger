@@ -11,6 +11,10 @@ const cors = require('cors');
 var session = require('express-session');
 let connected = require('./statics/variable').connected;
 var ObjectId=require('mongodb').ObjectID;
+var flash = require('connect-flash');
+
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 require('./model/db');
 //Express Middleware
@@ -38,6 +42,8 @@ app.use('/', require('./routes'));
 let users = require('./model/users');
 
 
+
+  app.use(flash());
 
 io.on('connection', function(socket){
     console.log('connected');

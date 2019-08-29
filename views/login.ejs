@@ -20,6 +20,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 </head>
 <body>
 	<!-- main -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
 	<div class="main-w3layouts wrapper">
 		<h1>LOGIN</h1>
 		<div class="main-agileinfo">
@@ -56,4 +58,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 	</div>
 	<!-- //main -->
 </body>
+<script>
+	$(document).ready(function(){
+		if("<%=messages%>")
+		 alert("<%=messages%>");
+});
+	
+	</script>
 </html>

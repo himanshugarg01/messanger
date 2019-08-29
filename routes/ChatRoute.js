@@ -1,11 +1,12 @@
 let router = require('express').Router();
 let services = require('../services/index');
 let middleFunc=require('../statics/functions').middleFunc;
-
+var flash = require('connect-flash');
+router.use(flash());
 
 
 router.get('/',middleFunc ,(req, res) => {
-    res.render('chat');
+    res.render('chat',{ messages: req.flash('info') });
 })
 
 

@@ -1,10 +1,18 @@
 let users = require('../model/users');
 let messages = require('../model/messages');
 var ObjectId=require('mongodb').ObjectID;
+//var flash = require('connect-flash');
+//router.use(flash());
 
   function AddFriend(req, res){
     let {friendName} = req.body;
     var friendId;
+    if(friendName==req.session.userName)
+    {
+      req.flash('info', 'you cannot add yourself as your friend');
+      res.redirect('/addFriend');
+    }
+    else{
     users.findOne({
       "userName" : friendName
     })
@@ -90,17 +98,18 @@ var ObjectId=require('mongodb').ObjectID;
         .catch(err => {
           res.json({error: true});
         })
-  
+        req.flash('info', 'friend added')
            })
            .catch(err => {
+            req.flash('info', 'no friend found')
              console.error(err)
-             res.send(error)
+             res.redirect('/addFriend/')
            })
       
 
 
 
-    
+          }
   }
 
 module.exports = {
